@@ -1,0 +1,10 @@
+{
+  "name": "prediction-market",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test engine/*.test.js",
+    "demo": "node engine/demo.js"
+  }
+}
