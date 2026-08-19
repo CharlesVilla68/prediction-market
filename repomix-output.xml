@@ -1,0 +1,711 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+engine/
+  demo.js
+  lmsr.js
+  lmsr.test.js
+server/
+  db.js
+  index.js
+  market.db-shm
+  market.db-wal
+.gitignore
+package.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="engine/demo.js">
+/**
+ * demo.js
+ * -----------------------------------------------------------------------
+ * A quick, human-readable script to SEE the pricing engine work before
+ * any server or UI exists. Run with: npm run demo
+ * -----------------------------------------------------------------------
+ */
+import { getPrices, buyShares, maxLoss } from './lmsr.js';
+
+const b = 100;
+let qYes = 0;
+let qNo = 0;
+
+const pct = (p) => `${(p * 100).toFixed(1)}%`;
+
+console.log(`\nMarket created with liquidity parameter b = ${b}`);
+console.log(`Max possible market-maker loss, fixed at creation: $${maxLoss(b).toFixed(2)}\n`);
+
+let prices = getPrices(qYes, qNo, b);
+console.log(`Before trade: Yes = ${pct(prices.yes)} / No = ${pct(prices.no)}`);
+
+const trade1 = buyShares({ qYes, qNo, b, side: 'yes', spend: 10 });
+qYes = trade1.newQYes;
+qNo = trade1.newQNo;
+console.log(
+  `\nTrader A spends $10 on Yes -> buys ${trade1.sharesBought.toFixed(2)} shares ` +
+    `(avg price $${trade1.avgPricePaid.toFixed(3)}/share)`
+);
+console.log(`After trade: Yes = ${pct(trade1.prices.yes)} / No = ${pct(trade1.prices.no)}`);
+
+const trade2 = buyShares({ qYes, qNo, b, side: 'no', spend: 25 });
+qYes = trade2.newQYes;
+qNo = trade2.newQNo;
+console.log(
+  `\nTrader B spends $25 on No -> buys ${trade2.sharesBought.toFixed(2)} shares ` +
+    `(avg price $${trade2.avgPricePaid.toFixed(3)}/share)`
+);
+console.log(`After trade: Yes = ${pct(trade2.prices.yes)} / No = ${pct(trade2.prices.no)}\n`);
+</file>
+
+<file path="engine/lmsr.js">
+/**
+ * lmsr.js
+ * -----------------------------------------------------------------------
+ * A standalone, dependency-free implementation of the Logarithmic Market
+ * Scoring Rule (LMSR) automated market maker for a binary (Yes/No) market.
+ *
+ * Nothing in this file knows about HTTP, a database, or React. It is pure
+ * math, on purpose — this is the part of the project that should work
+ * correctly and be testable completely on its own, before any of the
+ * "plumbing" (API, DB, UI) gets built around it.
+ *
+ * ----------------------------------------------------------------------
+ * THE MENTAL MODEL (see conversation for the full walkthrough):
+ *
+ *   - qYes / qNo: running totals of how many Yes / No shares have ever
+ *     been issued by the market maker. Just counters, nothing fancier.
+ *
+ *   - b: the "liquidity parameter" — a fixed knob chosen when the market
+ *     is created. Small b = thin market, big price swings on small
+ *     trades. Large b = deep market, needs bigger trades to move price.
+ *
+ *   - cost(qYes, qNo, b): the total amount of money that has flowed into
+ *     the market so far, as a function of the current share counts. The
+ *     price of the *next* increment of a Yes share is the slope of this
+ *     function with respect to qYes — practically, buying = moving from
+ *     one point on this curve to another, and paying the difference.
+ *
+ *   - price(qYes, qNo, b): the current implied probability of Yes (and,
+ *     symmetrically, of No). Always sums to 1. This is a softmax over
+ *     (qYes/b, qNo/b) — same shape as softmax in ML.
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Numerically-stable log(e^a + e^b).
+ *
+ * Why this exists: for large qYes/b or qNo/b, e^x can overflow to
+ * Infinity in floating point, even though the *true* mathematical
+ * result of log(e^a + e^b) is a perfectly reasonable number. The
+ * standard trick is to factor out the larger of the two exponents
+ * before exponentiating, which keeps every intermediate value small.
+ *
+ *   log(e^a + e^b) = m + log(e^(a-m) + e^(b-m)),  where m = max(a, b)
+ *
+ * This is the same trick used under the hood by softmax/log-sum-exp
+ * implementations in ML libraries.
+ */
+function logSumExp(a, b) {
+  const m = Math.max(a, b);
+  return m + Math.log(Math.exp(a - m) + Math.exp(b - m));
+}
+
+/**
+ * The LMSR cost function.
+ *
+ * cost(qYes, qNo) = b * log( e^(qYes/b) + e^(qNo/b) )
+ *
+ * Represents total money collected by the market maker so far, given
+ * the current outstanding share counts. Trades are priced by taking
+ * the *difference* in this function between two states (see costOfTrade
+ * below) — the function itself is rarely useful in isolation, but it's
+ * the foundation everything else is built on.
+ */
+export function costFunction(qYes, qNo, b) {
+  if (b <= 0) throw new Error('Liquidity parameter b must be positive');
+  return b * logSumExp(qYes / b, qNo / b);
+}
+
+/**
+ * Current market prices (implied probabilities) for Yes and No.
+ * These always sum to 1 by construction — it's a softmax over the two
+ * outcomes' share counts.
+ */
+export function getPrices(qYes, qNo, b) {
+  if (b <= 0) throw new Error('Liquidity parameter b must be positive');
+  // Stable softmax: subtract the max exponent before exponentiating.
+  const m = Math.max(qYes / b, qNo / b);
+  const eYes = Math.exp(qYes / b - m);
+  const eNo = Math.exp(qNo / b - m);
+  const total = eYes + eNo;
+  return {
+    yes: eYes / total,
+    no: eNo / total,
+  };
+}
+
+/**
+ * The dollar cost to buy `shares` additional shares of `side`
+ * ('yes' or 'no'), given the current state.
+ *
+ * This is just: cost(new state) - cost(old state). It's what a client
+ * would call to show "if I buy this many shares, here's what it costs"
+ * before the user confirms a trade.
+ */
+export function costOfTrade({ qYes, qNo, b, side, shares }) {
+  if (shares < 0) throw new Error('shares must be non-negative');
+  const before = costFunction(qYes, qNo, b);
+  const after =
+    side === 'yes'
+      ? costFunction(qYes + shares, qNo, b)
+      : costFunction(qYes, qNo + shares, b);
+  return after - before;
+}
+
+/**
+ * Given a dollar amount a trader wants to SPEND (not a share count —
+ * traders think in dollars, e.g. "I want to put in $10"), figure out
+ * how many shares of `side` that buys, and return the new state.
+ *
+ * This is the inverse of costOfTrade: instead of "shares -> cost", we
+ * go "cost -> shares". There IS a closed-form algebraic solution (no
+ * need for iterative search), derived like this for buying Yes:
+ *
+ *   cost(qYesNew, qNo) = spend + cost(qYes, qNo)
+ *   b*log(e^(qYesNew/b) + e^(qNo/b)) = target      [target = RHS above]
+ *   e^(qYesNew/b) = e^(target/b) - e^(qNo/b)
+ *   qYesNew = b * log( e^(target/b) - e^(qNo/b) )
+ *
+ * Rewritten in a numerically-stable form (factoring out the larger
+ * exponent so we never risk overflow), this becomes:
+ *
+ *   qYesNew = target + b * log(1 - e^((qNo - target)/b))
+ *
+ * where target = spend + cost(qYes, qNo)   [in dollar units, not /b]
+ *
+ * That refactor is exactly what's implemented below.
+ */
+export function buyShares({ qYes, qNo, b, side, spend }) {
+  if (spend <= 0) throw new Error('spend must be positive');
+  if (b <= 0) throw new Error('Liquidity parameter b must be positive');
+
+  const costBefore = costFunction(qYes, qNo, b);
+  const target = spend + costBefore; // dollar-denominated target cost
+
+  // qOther is whichever side ISN'T being bought — its count doesn't
+  // change during this trade.
+  const qBuying = side === 'yes' ? qYes : qNo;
+  const qOther = side === 'yes' ? qNo : qYes;
+
+  // Stable form of qNew = b * log(e^(target/b) - e^(qOther/b))
+  const qNew = target + b * Math.log(1 - Math.exp((qOther - target) / b));
+
+  const sharesBought = qNew - qBuying;
+
+  const newQYes = side === 'yes' ? qNew : qYes;
+  const newQNo = side === 'no' ? qNew : qNo;
+
+  return {
+    sharesBought,
+    newQYes,
+    newQNo,
+    prices: getPrices(newQYes, newQNo, b),
+    avgPricePaid: spend / sharesBought,
+  };
+}
+
+/**
+ * The theoretical worst-case loss for the market maker, fixed at market
+ * creation time purely by the choice of b. Useful for showing "here's
+ * how much capital I need to be willing to risk to run this market."
+ */
+export function maxLoss(b) {
+  return b * Math.log(2);
+}
+</file>
+
+<file path="engine/lmsr.test.js">
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  costFunction,
+  getPrices,
+  costOfTrade,
+  buyShares,
+  maxLoss,
+} from './lmsr.js';
+
+test('a fresh market with no shares issued starts at 50/50', () => {
+  const prices = getPrices(0, 0, 100);
+  assert.ok(Math.abs(prices.yes - 0.5) < 1e-9);
+  assert.ok(Math.abs(prices.no - 0.5) < 1e-9);
+  // prices must always sum to 1
+  assert.ok(Math.abs(prices.yes + prices.no - 1) < 1e-9);
+});
+
+test('buying $10 of Yes on a fresh b=100 market matches the hand-worked example (~54.8%)', () => {
+  const result = buyShares({ qYes: 0, qNo: 0, b: 100, side: 'yes', spend: 10 });
+
+  // From the manual walkthrough: ~19.1 shares, new price ~54.8%
+  assert.ok(Math.abs(result.sharesBought - 19.1) < 0.1);
+  assert.ok(Math.abs(result.prices.yes - 0.548) < 0.001);
+  assert.ok(Math.abs(result.prices.no - 0.452) < 0.001);
+});
+
+test('buying Yes increases Yes price and decreases No price, and they still sum to 1', () => {
+  const before = getPrices(0, 0, 100);
+  const { prices: after } = buyShares({ qYes: 0, qNo: 0, b: 100, side: 'yes', spend: 25 });
+
+  assert.ok(after.yes > before.yes);
+  assert.ok(after.no < before.no);
+  assert.ok(Math.abs(after.yes + after.no - 1) < 1e-9);
+});
+
+test('a smaller liquidity parameter b produces a bigger price swing for the same trade', () => {
+  const thin = buyShares({ qYes: 0, qNo: 0, b: 20, side: 'yes', spend: 10 });
+  const deep = buyShares({ qYes: 0, qNo: 0, b: 500, side: 'yes', spend: 10 });
+
+  const thinSwing = thin.prices.yes - 0.5;
+  const deepSwing = deep.prices.yes - 0.5;
+
+  assert.ok(thinSwing > deepSwing);
+});
+
+test('costOfTrade and buyShares agree with each other (inverse operations)', () => {
+  const b = 100;
+  const { sharesBought, newQYes, newQNo } = buyShares({
+    qYes: 0,
+    qNo: 0,
+    b,
+    side: 'yes',
+    spend: 15,
+  });
+
+  // If we ask "what would it cost to buy exactly that many shares",
+  // we should get back very close to the original $15 spend.
+  const recomputedCost = costOfTrade({
+    qYes: 0,
+    qNo: 0,
+    b,
+    side: 'yes',
+    shares: sharesBought,
+  });
+
+  assert.ok(Math.abs(recomputedCost - 15) < 1e-6);
+  assert.ok(newQYes > 0);
+  assert.equal(newQNo, 0);
+});
+
+test('repeated buys on the same side keep pushing price toward 1 but never reach or exceed it', () => {
+  let qYes = 0;
+  let qNo = 0;
+  const b = 50;
+  let lastPrice = 0.5;
+
+  for (let i = 0; i < 20; i++) {
+    const result = buyShares({ qYes, qNo, b, side: 'yes', spend: 20 });
+    assert.ok(result.prices.yes > lastPrice, 'price should keep climbing');
+    assert.ok(result.prices.yes < 1, 'price should never reach or exceed 1');
+    lastPrice = result.prices.yes;
+    qYes = result.newQYes;
+    qNo = result.newQNo;
+  }
+});
+
+test('cost function is symmetric: an all-No market costs the same as an equivalent all-Yes market', () => {
+  const b = 100;
+  const costYesHeavy = costFunction(30, 0, b);
+  const costNoHeavy = costFunction(0, 30, b);
+  assert.ok(Math.abs(costYesHeavy - costNoHeavy) < 1e-9);
+});
+
+test('maxLoss scales linearly with b, as the theory predicts (b * ln(2))', () => {
+  const loss100 = maxLoss(100);
+  const loss200 = maxLoss(200);
+  assert.ok(Math.abs(loss200 - loss100 * 2) < 1e-9);
+  assert.ok(Math.abs(loss100 - 69.31) < 0.01); // 100 * ln(2) ≈ 69.31
+});
+
+test('rejects an invalid (non-positive) liquidity parameter', () => {
+  assert.throws(() => costFunction(0, 0, 0));
+  assert.throws(() => costFunction(0, 0, -5));
+});
+
+test('rejects a non-positive spend amount', () => {
+  assert.throws(() => buyShares({ qYes: 0, qNo: 0, b: 100, side: 'yes', spend: 0 }));
+  assert.throws(() => buyShares({ qYes: 0, qNo: 0, b: 100, side: 'yes', spend: -10 }));
+});
+</file>
+
+<file path="server/db.js">
+/**
+ * db.js
+ * -----------------------------------------------------------------------
+ * SQLite setup, using better-sqlite3 (synchronous — no async/await needed
+ * for queries, which keeps the trade-pricing logic simple and avoids
+ * race conditions between concurrent writes for this demo).
+ *
+ * Two tables only:
+ *   - markets: one row per market, including a CACHED copy of the
+ *     current qYes/qNo totals (for fast price reads).
+ *   - trades: append-only log of every trade ever placed. This is the
+ *     source of truth. Positions and price history are both derived
+ *     from this table rather than stored separately, so there's only
+ *     ever one place that can be "wrong."
+ * -----------------------------------------------------------------------
+ */
+import Database from "better-sqlite3";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dbPath = path.join(__dirname, "market.db");
+
+export const db = new Database(dbPath);
+db.pragma("journal_mode = WAL");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS markets (
+    id TEXT PRIMARY KEY,
+    question TEXT NOT NULL,
+    resolution_date TEXT,
+    b REAL NOT NULL,
+    q_yes REAL NOT NULL DEFAULT 0,
+    q_no REAL NOT NULL DEFAULT 0,
+    resolved INTEGER NOT NULL DEFAULT 0,
+    outcome TEXT,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS trades (
+    id TEXT PRIMARY KEY,
+    market_id TEXT NOT NULL,
+    trader TEXT NOT NULL,
+    side TEXT NOT NULL,
+    spend REAL NOT NULL,
+    shares REAL NOT NULL,
+    price_after REAL NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (market_id) REFERENCES markets(id)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_trades_market_id ON trades(market_id);
+`);
+</file>
+
+<file path="server/index.js">
+/**
+ * index.js
+ * -----------------------------------------------------------------------
+ * The Express API. Four real endpoints plus a list endpoint:
+ *
+ *   POST /api/markets            create a market
+ *   GET  /api/markets            list all markets
+ *   GET  /api/markets/:id        one market's full state + trade history
+ *   POST /api/markets/:id/trades place a trade (buy Yes or No)
+ *   POST /api/markets/:id/resolve   admin: resolve + compute payouts
+ *
+ * This file intentionally has NO pricing math in it — every dollar/share
+ * calculation is delegated to engine/lmsr.js. The server's job is just:
+ * validate input, call the engine, persist the result, respond.
+ * -----------------------------------------------------------------------
+ */
+import express from "express";
+import cors from "cors";
+import { nanoid } from "nanoid";
+import { db } from "./db.js";
+import { getPrices, buyShares, maxLoss } from "../engine/lmsr.js";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// ---- helpers -------------------------------------------------------
+
+function marketSummary(row) {
+  const prices = getPrices(row.q_yes, row.q_no, row.b);
+  return {
+    id: row.id,
+    question: row.question,
+    resolutionDate: row.resolution_date,
+    b: row.b,
+    resolved: !!row.resolved,
+    outcome: row.outcome,
+    prices,
+    maxLoss: maxLoss(row.b),
+  };
+}
+
+function getMarketOrThrow(id) {
+  const row = db.prepare("SELECT * FROM markets WHERE id = ?").get(id);
+  if (!row) {
+    const err = new Error("Market not found");
+    err.status = 404;
+    throw err;
+  }
+  return row;
+}
+
+// ---- routes ---------------------------------------------------------
+
+// Create a market
+app.post("/api/markets", (req, res, next) => {
+  try {
+    const { question, resolutionDate, b } = req.body;
+    if (!question || typeof question !== "string") {
+      return res.status(400).json({ error: "question is required" });
+    }
+    if (!b || b <= 0) {
+      return res
+        .status(400)
+        .json({ error: "b (liquidity parameter) must be a positive number" });
+    }
+
+    const id = nanoid(10);
+    db.prepare(
+      `INSERT INTO markets (id, question, resolution_date, b, q_yes, q_no, resolved, outcome, created_at)
+       VALUES (?, ?, ?, ?, 0, 0, 0, NULL, ?)`
+    ).run(id, question, resolutionDate ?? null, b, new Date().toISOString());
+
+    const row = getMarketOrThrow(id);
+    res.status(201).json(marketSummary(row));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// List all markets
+app.get("/api/markets", (req, res, next) => {
+  try {
+    const rows = db
+      .prepare("SELECT * FROM markets ORDER BY created_at DESC")
+      .all();
+    res.json(rows.map(marketSummary));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// One market's full state, including trade history for the price chart
+app.get("/api/markets/:id", (req, res, next) => {
+  try {
+    const row = getMarketOrThrow(req.params.id);
+    const trades = db
+      .prepare(
+        "SELECT * FROM trades WHERE market_id = ? ORDER BY created_at ASC"
+      )
+      .all(req.params.id);
+
+    const volume = trades.reduce((sum, t) => sum + t.spend, 0);
+
+    res.json({
+      ...marketSummary(row),
+      volume,
+      trades: trades.map((t) => ({
+        id: t.id,
+        trader: t.trader,
+        side: t.side,
+        spend: t.spend,
+        shares: t.shares,
+        priceAfter: t.price_after,
+        createdAt: t.created_at,
+      })),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Place a trade
+app.post("/api/markets/:id/trades", (req, res, next) => {
+  try {
+    const market = getMarketOrThrow(req.params.id);
+    if (market.resolved) {
+      return res
+        .status(400)
+        .json({ error: "Market is already resolved; no more trading" });
+    }
+
+    const { trader, side, spend } = req.body;
+    if (!trader || typeof trader !== "string") {
+      return res.status(400).json({ error: "trader is required" });
+    }
+    if (side !== "yes" && side !== "no") {
+      return res.status(400).json({ error: "side must be 'yes' or 'no'" });
+    }
+    if (!spend || spend <= 0) {
+      return res.status(400).json({ error: "spend must be a positive number" });
+    }
+
+    const result = buyShares({
+      qYes: market.q_yes,
+      qNo: market.q_no,
+      b: market.b,
+      side,
+      spend,
+    });
+
+    const tradeId = nanoid(10);
+    const now = new Date().toISOString();
+    const priceAfter = side === "yes" ? result.prices.yes : result.prices.no;
+
+    // Update the cached qYes/qNo on the market, and append the trade —
+    // both in one transaction so they can never get out of sync.
+    const tx = db.transaction(() => {
+      db.prepare("UPDATE markets SET q_yes = ?, q_no = ? WHERE id = ?").run(
+        result.newQYes,
+        result.newQNo,
+        market.id
+      );
+      db.prepare(
+        `INSERT INTO trades (id, market_id, trader, side, spend, shares, price_after, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      ).run(
+        tradeId,
+        market.id,
+        trader,
+        side,
+        spend,
+        result.sharesBought,
+        priceAfter,
+        now
+      );
+    });
+    tx();
+
+    res.status(201).json({
+      tradeId,
+      sharesBought: result.sharesBought,
+      avgPricePaid: result.avgPricePaid,
+      prices: result.prices,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Resolve a market and compute payouts (admin-only in spirit — no real
+// auth here since this is a solo demo, but this is the seam where
+// an auth check would go in a real deployment)
+app.post("/api/markets/:id/resolve", (req, res, next) => {
+  try {
+    const market = getMarketOrThrow(req.params.id);
+    if (market.resolved) {
+      return res.status(400).json({ error: "Market is already resolved" });
+    }
+
+    const { outcome } = req.body;
+    if (outcome !== "yes" && outcome !== "no") {
+      return res.status(400).json({ error: "outcome must be 'yes' or 'no'" });
+    }
+
+    db.prepare("UPDATE markets SET resolved = 1, outcome = ? WHERE id = ?").run(
+      outcome,
+      market.id
+    );
+
+    // Payouts: for each trader, sum their shares on the WINNING side.
+    // Winning shares pay $1 each; losing shares pay $0 (so they're
+    // just omitted).
+    const payoutRows = db
+      .prepare(
+        `SELECT trader, SUM(shares) as totalShares
+         FROM trades
+         WHERE market_id = ? AND side = ?
+         GROUP BY trader`
+      )
+      .all(market.id, outcome);
+
+    const payouts = payoutRows.map((r) => ({
+      trader: r.trader,
+      winningShares: r.totalShares,
+      payout: r.totalShares, // $1 per winning share
+    }));
+
+    res.json({ outcome, payouts });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---- error handler ---------------------------------------------------
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res
+    .status(err.status || 500)
+    .json({ error: err.message || "Internal server error" });
+});
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Prediction market API running on http://localhost:${PORT}`);
+});
+</file>
+
+<file path=".gitignore">
+node_modules/
+.env
+*.db
+</file>
+
+<file path="package.json">
+{
+  "name": "prediction-market",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test engine/*.test.js",
+    "demo": "node engine/demo.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "nanoid": "^6.0.1"
+  }
+}
+</file>
+
+</files>
