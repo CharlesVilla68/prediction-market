@@ -1,0 +1,3 @@
+- Client folder terminal: npm run dev
+- Root directory terminal 1: node server/index.js
+- Root directory terminal 2: node scripts/simulate-trading.js "market ID" XX --> EXAMPLE: node script/simulate-trading.js Gbq3N1ioRE 27
