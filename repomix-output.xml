@@ -45,11 +45,18 @@ client/
     favicon.svg
     icons.svg
   src/
-    assets/
-      hero.png
-      react.svg
-      vite.svg
+    components/
+      CreateMarketForm.jsx
+      MarketCard.jsx
+      PriceChart.jsx
+      ResolvePanel.jsx
+      TradePanel.jsx
+    pages/
+      HomePage.jsx
+      MarketPage.jsx
+    api.js
     App.jsx
+    index.css
     main.jsx
   .gitignore
   .oxlintrc.json
@@ -104,150 +111,1275 @@ This section contains the contents of the repository's files.
 </svg>
 </file>
 
-<file path="client/src/assets/react.svg">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+<file path="client/src/components/CreateMarketForm.jsx">
+import { useState } from "react";
+import { api } from "../api";
+
+/**
+ * CreateMarketForm
+ * -----------------------------------------------------------------------
+ * This is a "controlled form" — every input's value is driven by React
+ * state (useState), and every keystroke updates that state via onChange.
+ * React is the single source of truth for what's in each field, not the
+ * DOM itself. That's the standard React way to handle forms, because it
+ * means you can validate, transform, or react to changes as they happen.
+ * -----------------------------------------------------------------------
+ */
+export function CreateMarketForm({ onCreated }) {
+  const [question, setQuestion] = useState("");
+  const [resolutionDate, setResolutionDate] = useState("");
+  const [liquidity, setLiquidity] = useState("100");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function handleSubmit(e) {
+    e.preventDefault(); // stop the browser's default full-page-reload form submit
+    setError(null);
+
+    const b = Number(liquidity);
+    if (!question.trim()) {
+      setError("Give the market a question.");
+      return;
+    }
+    if (!b || b <= 0) {
+      setError("Liquidity parameter must be a positive number.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const market = await api.createMarket({
+        question: question.trim(),
+        resolutionDate: resolutionDate || null,
+        b,
+      });
+      setQuestion("");
+      setResolutionDate("");
+      setLiquidity("100");
+      onCreated(market);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {error && <div className="error-banner">{error}</div>}
+
+      <div className="field">
+        <label htmlFor="question">Question</label>
+        <input
+          id="question"
+          type="text"
+          placeholder="Will the Fed cut rates in September?"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor="resolutionDate">Resolution date (optional)</label>
+        <input
+          id="resolutionDate"
+          type="date"
+          value={resolutionDate}
+          onChange={(e) => setResolutionDate(e.target.value)}
+        />
+      </div>
+
+      <div className="field">
+        <label htmlFor="liquidity">Liquidity parameter (b)</label>
+        <input
+          id="liquidity"
+          type="number"
+          min="1"
+          step="1"
+          value={liquidity}
+          onChange={(e) => setLiquidity(e.target.value)}
+        />
+        <span className="field-hint">
+          Higher b = deeper market, trades move price less. Max market-maker
+          loss is b &times; ln(2) &asymp;{" "}
+          {(Number(liquidity) * 0.6931).toFixed(2) || "0"}.
+        </span>
+      </div>
+
+      <button
+        type="submit"
+        className="btn btn--primary btn--block"
+        disabled={submitting}>
+        {submitting ? "Creating…" : "Create market"}
+      </button>
+    </form>
+  );
+}
 </file>
 
-<file path="client/src/assets/vite.svg">
-<svg xmlns="http://www.w3.org/2000/svg" width="77" height="47" fill="none" aria-labelledby="vite-logo-title" viewBox="0 0 77 47"><title id="vite-logo-title">Vite</title><style>.parenthesis{fill:#000}@media (prefers-color-scheme:dark){.parenthesis{fill:#fff}}</style><path fill="#9135ff" d="M40.151 45.71c-.663.844-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.493c-.92 0-1.457-1.04-.92-1.788l7.479-10.471c1.07-1.498 0-3.578-1.842-3.578H15.443c-.92 0-1.456-1.04-.92-1.788l9.696-13.576c.213-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.472c-1.07 1.497 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.087.89 1.83L40.153 45.712z"/><mask id="a" width="48" height="47" x="14" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M40.047 45.71c-.663.843-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.389c-.92 0-1.457-1.04-.92-1.788l7.479-10.472c1.07-1.497 0-3.578-1.842-3.578H15.34c-.92 0-1.456-1.04-.92-1.788l9.696-13.575c.213-.297.556-.474.92-.474H53.93c.92 0 1.456 1.04.92 1.788L47.37 13.03c-1.07 1.498 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.088.89 1.831L40.049 45.712z"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#eee6ff" rx="5.508" ry="14.704" transform="rotate(269.814 20.96 11.29)scale(-1 1)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#eee6ff" rx="10.399" ry="29.851" transform="rotate(89.814 -16.902 -8.275)scale(1 -1)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#8900ff" rx="5.508" ry="30.487" transform="rotate(89.814 -19.197 -7.127)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.928 4.177)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.738 5.52)scale(1 -1)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#eee6ff" rx="14.072" ry="22.078" transform="rotate(93.35 31.245 55.578)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx="14.592" cy="9.743" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(39.51 14.592 9.743)"/></g><g filter="url(#k)"><ellipse cx="61.728" cy="-5.321" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 61.728 -5.32)"/></g><g filter="url(#l)"><ellipse cx="55.618" cy="7.104" fill="#00c2ff" rx="5.971" ry="9.665" transform="rotate(37.892 55.618 7.104)"/></g><g filter="url(#m)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#n)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#o)"><ellipse cx="49.857" cy="30.678" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 49.857 30.678)"/></g><g filter="url(#p)"><ellipse cx="52.623" cy="33.171" fill="#00c2ff" rx="5.971" ry="15.297" transform="rotate(37.892 52.623 33.17)"/></g></g><path d="M6.919 0c-9.198 13.166-9.252 33.575 0 46.789h6.215c-9.25-13.214-9.196-33.623 0-46.789zm62.424 0h-6.215c9.198 13.166 9.252 33.575 0 46.789h6.215c9.25-13.214 9.196-33.623 0-46.789" class="parenthesis"/><defs><filter id="b" width="60.045" height="41.654" x="-5.564" y="16.92" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-40.407" y="-6.762" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-35.435" y="2.801" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-30.84" y="20.8" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-29.307" y="21.949" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="29.961" y="-17.13" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-13.43" y="-22.082" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="34.321" y="-37.644" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="38.847" y="-10.552" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="22.45" y="-1.645" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="32.919" y="11.36" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter></defs></svg>
+<file path="client/src/components/MarketCard.jsx">
+import { Link } from "react-router-dom";
+
+/**
+ * MarketCard
+ * -----------------------------------------------------------------------
+ * Purely presentational — takes a market object as a prop and renders
+ * it. It doesn't fetch anything or hold its own state; all the data it
+ * needs is handed to it by the parent (HomePage). This is a common React
+ * pattern worth knowing the name of: "presentational" or "dumb" components
+ * vs. "container" components that manage state/data-fetching.
+ * -----------------------------------------------------------------------
+ */
+export function MarketCard({ market }) {
+  const yesPct = Math.round(market.prices.yes * 100);
+
+  return (
+    <Link to={`/markets/${market.id}`} className="market-card">
+      <div className="market-card__top">
+        <div className="market-card__question">{market.question}</div>
+        <div
+          className="market-card__prob"
+          style={{
+            color: yesPct >= 50 ? "var(--color-yes)" : "var(--color-no)",
+          }}>
+          {yesPct}%
+        </div>
+      </div>
+
+      <div className="market-card__bar">
+        <div
+          className="market-card__bar-fill"
+          style={{ width: `${yesPct}%` }}
+        />
+      </div>
+
+      <div className="market-card__meta">
+        {market.resolved ? (
+          <span className={`badge badge--resolved-${market.outcome}`}>
+            Resolved &middot; {market.outcome === "yes" ? "Yes" : "No"}
+          </span>
+        ) : (
+          <span className="badge badge--open">Open</span>
+        )}
+        <span>Liquidity b = {market.b}</span>
+      </div>
+    </Link>
+  );
+}
 </file>
 
-<file path="client/src/App.jsx">
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+<file path="client/src/components/PriceChart.jsx">
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
-function App() {
-  const [count, setCount] = useState(0)
+/**
+ * PriceChart
+ * -----------------------------------------------------------------------
+ * Turns the market's trade history into a "probability over time" line
+ * chart. Each trade already stores priceAfter (the price of whichever
+ * side was traded, right after that trade), so we normalize everything
+ * to Yes's price and hand it to recharts. We prepend a synthetic "Start"
+ * point at 50% so the chart always shows where the market began.
+ * -----------------------------------------------------------------------
+ */
+export function PriceChart({ trades }) {
+  const normalizedPoints = [
+    { label: "Start", yesPct: 50 },
+    ...trades.map((t) => ({
+      label: new Date(t.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      yesPct:
+        Math.round(
+          (t.side === "yes" ? t.priceAfter : 1 - t.priceAfter) * 1000
+        ) / 10,
+    })),
+  ];
+
+  if (trades.length === 0) {
+    return (
+      <div className="empty-state">
+        No trades yet — this market is still at its starting price.
+      </div>
+    );
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height={220}>
+      <LineChart
+        data={normalizedPoints}
+        margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+        <CartesianGrid
+          stroke="var(--color-border)"
+          strokeDasharray="3 3"
+          vertical={false}
+        />
+        <XAxis
+          dataKey="label"
+          stroke="var(--color-text-faint)"
+          fontSize={11}
+          tickLine={false}
+          axisLine={false}
+        />
+        <YAxis
+          domain={[0, 100]}
+          stroke="var(--color-text-faint)"
+          fontSize={11}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(v) => `${v}%`}
+        />
+        <Tooltip
+          contentStyle={{
+            background: "var(--color-surface-raised)",
+            border: "1px solid var(--color-border)",
+            borderRadius: 8,
+            fontSize: 12,
+          }}
+          formatter={(value) => [`${value}%`, "Yes probability"]}
+        />
+        <Line
+          type="monotone"
+          dataKey="yesPct"
+          stroke="var(--color-yes)"
+          strokeWidth={2}
+          dot={{ r: 3, fill: "var(--color-yes)" }}
+          activeDot={{ r: 5 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+</file>
+
+<file path="client/src/components/ResolvePanel.jsx">
+import { useState } from "react";
+import { api } from "../api";
+
+/**
+ * ResolvePanel
+ * -----------------------------------------------------------------------
+ * The "admin" action — marking a market resolved as Yes or No, which
+ * triggers payout calculation on the backend. There's no real auth
+ * here, so anyone can resolve any market — fine for a solo sandbox,
+ * and a good thing to flag in an interview as "here's the seam where
+ * I'd add an admin role and auth check for production."
+ * -----------------------------------------------------------------------
+ */
+export function ResolvePanel({ marketId, resolved, outcome, onResolved }) {
+  const [submitting, setSubmitting] = useState(false);
+  const [payouts, setPayouts] = useState(null);
+  const [error, setError] = useState(null);
+
+  async function resolve(outcomeChoice) {
+    setError(null);
+    setSubmitting(true);
+    try {
+      const result = await api.resolveMarket(marketId, outcomeChoice);
+      setPayouts(result.payouts);
+      await onResolved();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (resolved) {
+    return (
+      <div className="card">
+        <div className="card__title">Resolution</div>
+        <p style={{ fontSize: 14, color: "var(--color-text-dim)" }}>
+          This market resolved as{" "}
+          <strong
+            style={{
+              color: outcome === "yes" ? "var(--color-yes)" : "var(--color-no)",
+            }}>
+            {outcome === "yes" ? "Yes" : "No"}
+          </strong>
+          . Winning shares paid $1 each.
+        </p>
+        {payouts && payouts.length > 0 && (
+          <div style={{ marginTop: 12 }}>
+            {payouts.map((p) => (
+              <div className="payout-row" key={p.trader}>
+                <span>{p.trader}</span>
+                <span>${p.payout.toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="card">
+      <div className="card__title">Resolve market</div>
+      {error && <div className="error-banner">{error}</div>}
+      <p
+        style={{
+          fontSize: 13,
+          color: "var(--color-text-faint)",
+          marginTop: 0,
+        }}>
+        Once you know the real-world outcome, resolve the market here. Winning
+        shares will pay out $1 each; losing shares pay $0.
+      </p>
+      <div className="resolve-panel">
+        <button
+          className="btn btn--yes"
+          disabled={submitting}
+          onClick={() => resolve("yes")}>
+          Resolve Yes
+        </button>
+        <button
+          className="btn btn--no"
+          disabled={submitting}
+          onClick={() => resolve("no")}>
+          Resolve No
+        </button>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="client/src/components/TradePanel.jsx">
+import { useState } from "react";
+import { api } from "../api";
+
+/**
+ * TradePanel
+ * -----------------------------------------------------------------------
+ * Lets the user pick Yes/No, enter a trader name and dollar amount, and
+ * submit a trade. After a successful trade, it calls `onTraded` — the
+ * parent (MarketPage) passes in a function that re-fetches the market,
+ * which is how the price and chart update immediately without a page
+ * reload. This is the "lift state up" pattern: this component doesn't
+ * hold the market's data itself, it just tells its parent "something
+ * changed, go refresh."
+ * -----------------------------------------------------------------------
+ */
+export function TradePanel({ marketId, resolved, onTraded }) {
+  const [side, setSide] = useState("yes");
+  const [trader, setTrader] = useState("");
+  const [spend, setSpend] = useState("10");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [lastResult, setLastResult] = useState(null);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError(null);
+    setLastResult(null);
+
+    const amount = Number(spend);
+    if (!trader.trim()) {
+      setError("Enter a trader name (any name works — this is a sandbox).");
+      return;
+    }
+    if (!amount || amount <= 0) {
+      setError("Enter a positive dollar amount.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const result = await api.placeTrade(marketId, {
+        trader: trader.trim(),
+        side,
+        spend: amount,
+      });
+      setLastResult(result);
+      await onTraded();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (resolved) {
+    return (
+      <div className="card">
+        <div className="card__title">Trading</div>
+        <div className="empty-state">
+          This market has been resolved — trading is closed.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card">
+      <div className="card__title">Place a trade</div>
+
+      <div className="trade-tabs">
+        <button
+          type="button"
+          className={`trade-tab ${
+            side === "yes" ? "trade-tab--active-yes" : ""
+          }`}
+          onClick={() => setSide("yes")}>
+          Buy Yes
+        </button>
+        <button
+          type="button"
+          className={`trade-tab ${side === "no" ? "trade-tab--active-no" : ""}`}
+          onClick={() => setSide("no")}>
+          Buy No
+        </button>
+      </div>
+
+      {error && <div className="error-banner">{error}</div>}
+      {lastResult && (
+        <div className="success-banner">
+          Bought {lastResult.sharesBought.toFixed(2)} {side} shares at an
+          average price of ${lastResult.avgPricePaid.toFixed(3)}.
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className="field">
+          <label htmlFor="trader">Trader name</label>
+          <input
+            id="trader"
+            type="text"
+            placeholder="e.g. alice, or your own name"
+            value={trader}
+            onChange={(e) => setTrader(e.target.value)}
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="spend">Amount to spend ($)</label>
+          <input
+            id="spend"
+            type="number"
+            min="0.01"
+            step="0.01"
+            value={spend}
+            onChange={(e) => setSpend(e.target.value)}
+          />
+        </div>
+
+        <button
+          type="submit"
+          className={`btn btn--block ${
+            side === "yes" ? "btn--yes" : "btn--no"
+          }`}
+          disabled={submitting}>
+          {submitting
+            ? "Placing trade…"
+            : `Buy ${side === "yes" ? "Yes" : "No"} — $${spend || "0"}`}
+        </button>
+      </form>
+    </div>
+  );
+}
+</file>
+
+<file path="client/src/pages/HomePage.jsx">
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../api";
+import { MarketCard } from "../components/MarketCard";
+import { CreateMarketForm } from "../components/CreateMarketForm";
+
+/**
+ * HomePage
+ * -----------------------------------------------------------------------
+ * Lists all markets, and hosts the create-market form. This is a
+ * "container" component — it owns the data (fetches markets, holds them
+ * in state) and hands that data down to the purely presentational
+ * MarketCard components.
+ *
+ * useEffect here runs once when the page first mounts (empty dependency
+ * array `[]`) to fetch the market list. If you haven't used useEffect
+ * before: it's React's way of running code in response to a component
+ * appearing on screen (or specific values changing) — here, "when this
+ * page first loads, go fetch the markets."
+ * -----------------------------------------------------------------------
+ */
+export function HomePage() {
+  const [markets, setMarkets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    loadMarkets();
+  }, []);
+
+  async function loadMarkets() {
+    try {
+      const data = await api.getMarkets();
+      setMarkets(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleCreated(market) {
+    // Jump straight into the new market's trading page — nicer flow
+    // than staying on the list after creating one.
+    navigate(`/markets/${market.id}`);
+  }
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <h1 className="page-title">Markets</h1>
+      <p className="page-subtitle">
+        A sandbox prediction market. Create a question, trade Yes/No, and watch
+        the price move.
+      </p>
 
-      <div className="ticks"></div>
+      <div className="card" style={{ marginBottom: 32 }}>
+        <div className="card__title">Create a market</div>
+        <CreateMarketForm onCreated={handleCreated} />
+      </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {loading && <div className="empty-state">Loading markets…</div>}
+      {error && <div className="error-banner">{error}</div>}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      {!loading && !error && markets.length === 0 && (
+        <div className="empty-state">
+          No markets yet — create the first one above.
+        </div>
+      )}
+
+      <div className="market-list">
+        {markets.map((market) => (
+          <MarketCard key={market.id} market={market} />
+        ))}
+      </div>
     </>
-  )
+  );
 }
-
-export default App
 </file>
 
-<file path="client/src/main.jsx">
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+<file path="client/src/pages/MarketPage.jsx">
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { api } from "../api";
+import { PriceChart } from "../components/PriceChart";
+import { TradePanel } from "../components/TradePanel";
+import { ResolvePanel } from "../components/ResolvePanel";
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+/**
+ * MarketPage
+ * -----------------------------------------------------------------------
+ * The trading view for a single market. useParams() reads the `:id`
+ * segment out of the URL (e.g. /markets/abc123 -> id = "abc123") — that's
+ * how React Router hands URL data to a page component.
+ *
+ * `loadMarket` is passed down to TradePanel and ResolvePanel as
+ * onTraded / onResolved. When either of those components successfully
+ * completes an action, they call this function, which re-fetches the
+ * market and updates state — that's the entire mechanism behind "the
+ * chart and price update immediately after a trade, with no page
+ * reload." React just re-renders whatever depends on that state.
+ * -----------------------------------------------------------------------
+ */
+export function MarketPage() {
+  const { id } = useParams();
+  const [market, setMarket] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    loadMarket();
+  }, [id]);
+
+  async function loadMarket() {
+    try {
+      const data = await api.getMarket(id);
+      setMarket(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) return <div className="empty-state">Loading market…</div>;
+  if (error) return <div className="error-banner">{error}</div>;
+  if (!market) return null;
+
+  const yesPct = Math.round(market.prices.yes * 100);
+  const noPct = 100 - yesPct;
+
+  return (
+    <>
+      <Link to="/" className="back-link">
+        &larr; All markets
+      </Link>
+
+      <div className="market-header">
+        <h1 className="market-header__question">{market.question}</h1>
+        <div className="market-header__meta">
+          <span>Liquidity b = {market.b}</span>
+          <span>Volume ${market.volume.toFixed(2)}</span>
+          <span>Max loss ${market.maxLoss.toFixed(2)}</span>
+          {market.resolutionDate && (
+            <span>Resolves {market.resolutionDate}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="price-hero">
+        <span className="price-hero__value price-hero__value--yes">
+          {yesPct}%
+        </span>
+        <span className="price-hero__label">Yes</span>
+        <span style={{ color: "var(--color-text-faint)" }}>&middot;</span>
+        <span className="price-hero__value price-hero__value--no">
+          {noPct}%
+        </span>
+        <span className="price-hero__label">No</span>
+      </div>
+
+      <div className="card">
+        <div className="card__title">Probability over time</div>
+        <PriceChart trades={market.trades} />
+      </div>
+
+      <TradePanel
+        marketId={market.id}
+        resolved={market.resolved}
+        onTraded={loadMarket}
+      />
+
+      <ResolvePanel
+        marketId={market.id}
+        resolved={market.resolved}
+        outcome={market.outcome}
+        onResolved={loadMarket}
+      />
+
+      <div className="card">
+        <div className="card__title">Trade history</div>
+        {market.trades.length === 0 ? (
+          <div className="empty-state">No trades yet.</div>
+        ) : (
+          <table className="trades-table">
+            <thead>
+              <tr>
+                <th>Trader</th>
+                <th>Side</th>
+                <th>Spend</th>
+                <th>Shares</th>
+                <th>Price after</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...market.trades].reverse().map((t) => (
+                <tr key={t.id}>
+                  <td>{t.trader}</td>
+                  <td>
+                    <span className={`side-pill side-pill--${t.side}`}>
+                      {t.side}
+                    </span>
+                  </td>
+                  <td>${t.spend.toFixed(2)}</td>
+                  <td>{t.shares.toFixed(2)}</td>
+                  <td>{(t.priceAfter * 100).toFixed(1)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </>
+  );
+}
+</file>
+
+<file path="client/src/api.js">
+/**
+ * api.js
+ * -----------------------------------------------------------------------
+ * Every call to our Express backend goes through here. Centralizing this
+ * means: one place to change the base URL (e.g. when deploying), one
+ * place to handle errors consistently, and components stay simple —
+ * they just call `api.getMarkets()` instead of writing fetch() calls
+ * with URLs and headers scattered everywhere.
+ * -----------------------------------------------------------------------
+ */
+
+const BASE_URL = "/api";
+
+async function request(path, options = {}) {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Something went wrong");
+  }
+
+  return data;
+}
+
+export const api = {
+  getMarkets: () => request("/markets"),
+
+  getMarket: (id) => request(`/markets/${id}`),
+
+  createMarket: ({ question, resolutionDate, b }) =>
+    request("/markets", {
+      method: "POST",
+      body: JSON.stringify({ question, resolutionDate, b }),
+    }),
+
+  placeTrade: (marketId, { trader, side, spend }) =>
+    request(`/markets/${marketId}/trades`, {
+      method: "POST",
+      body: JSON.stringify({ trader, side, spend }),
+    }),
+
+  resolveMarket: (marketId, outcome) =>
+    request(`/markets/${marketId}/resolve`, {
+      method: "POST",
+      body: JSON.stringify({ outcome }),
+    }),
+};
+</file>
+
+<file path="client/src/index.css">
+:root {
+  --color-bg: #0b0e14;
+  --color-surface: #12161f;
+  --color-surface-raised: #191f2b;
+  --color-border: #262d3b;
+  --color-text: #e8eaed;
+  --color-text-dim: #8b93a7;
+  --color-text-faint: #5b6478;
+
+  --color-yes: #22c55e;
+  --color-yes-dim: #14532d;
+  --color-no: #ef4444;
+  --color-no-dim: #7f1d1d;
+
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: inherit;
+}
+
+/* ---------- layout shell ---------- */
+
+.app-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  border-bottom: 1px solid var(--color-border);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.app-header__brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--color-yes), var(--color-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.app-main {
+  flex: 1;
+  max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ---------- typography helpers ---------- */
+
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+
+.page-subtitle {
+  color: var(--color-text-dim);
+  font-size: 14px;
+  margin: 0 0 32px;
+}
+
+/* ---------- market list ---------- */
+
+.market-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.market-card {
+  display: block;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.market-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.market-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.market-card__question {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.market-card__prob {
+  font-size: 22px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.market-card__bar {
+  margin-top: 14px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-no-dim);
+  overflow: hidden;
+}
+
+.market-card__bar-fill {
+  height: 100%;
+  background: var(--color-yes);
+}
+
+.market-card__meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--color-text-faint);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge--open {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-accent-hover);
+}
+
+.badge--resolved-yes {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-yes);
+}
+
+.badge--resolved-no {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-no);
+}
+
+/* ---------- forms / buttons ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.field input {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.field input:focus {
+  border-color: var(--color-accent);
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--color-text-faint);
+}
+
+.btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: filter 0.15s ease, transform 0.05s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--color-accent);
+  color: white;
+}
+
+.btn--primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn--yes {
+  background: var(--color-yes);
+  color: #06210f;
+}
+
+.btn--yes:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn--no {
+  background: var(--color-no);
+  color: #2b0a0a;
+}
+
+.btn--no:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-dim);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  border-color: var(--color-text-dim);
+  color: var(--color-text);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* ---------- market detail page ---------- */
+
+.market-header {
+  margin-bottom: 24px;
+}
+
+.market-header__question {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 10px;
+}
+
+.market-header__meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--color-text-faint);
+}
+
+.price-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.price-hero__value {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.price-hero__value--yes {
+  color: var(--color-yes);
+}
+
+.price-hero__value--no {
+  color: var(--color-no);
+}
+
+.price-hero__label {
+  font-size: 14px;
+  color: var(--color-text-dim);
+  font-weight: 600;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.card + .card {
+  margin-top: 20px;
+}
+
+.card__title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-dim);
+  margin: 0 0 16px;
+}
+
+.trade-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.trade-tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text-dim);
+  transition: all 0.15s ease;
+}
+
+.trade-tab--active-yes {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: var(--color-yes);
+  color: var(--color-yes);
+}
+
+.trade-tab--active-no {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--color-no);
+  color: var(--color-no);
+}
+
+.trade-summary {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--color-text-dim);
+  padding: 10px 0;
+  border-top: 1px solid var(--color-border);
+  margin-top: 6px;
+}
+
+.trade-summary strong {
+  color: var(--color-text);
+}
+
+.error-banner {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid var(--color-no);
+  color: #fca5a5;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.success-banner {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid var(--color-yes);
+  color: #86efac;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.trades-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.trades-table th {
+  text-align: left;
+  color: var(--color-text-faint);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.trades-table td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-dim);
+}
+
+.trades-table tr:last-child td {
+  border-bottom: none;
+}
+
+.side-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.side-pill--yes {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-yes);
+}
+
+.side-pill--no {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-no);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-text-faint);
+}
+
+.resolve-panel {
+  display: flex;
+  gap: 10px;
+}
+
+.payout-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.payout-row:last-child {
+  border-bottom: none;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-dim);
+  margin-bottom: 20px;
+}
+
+.back-link:hover {
+  color: var(--color-text);
+}
 </file>
 
 <file path="client/.gitignore">
@@ -349,16 +1481,6 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the Oxlint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
-</file>
-
-<file path="client/vite.config.js">
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-})
 </file>
 
 <file path="engine/demo.js">
@@ -992,6 +2114,87 @@ app.listen(PORT, () => {
 node_modules/
 .env
 *.db
+</file>
+
+<file path="client/src/App.jsx">
+import { Routes, Route } from "react-router-dom";
+import { HomePage } from "./pages/HomePage";
+import { MarketPage } from "./pages/MarketPage";
+
+/**
+ * App
+ * -----------------------------------------------------------------------
+ * The top-level shell: a header, plus <Routes> which swaps between page
+ * components based on the URL — "/" shows HomePage, "/markets/:id" shows
+ * MarketPage. This is React Router's core job: single-page-app navigation
+ * without a full browser page reload.
+ * -----------------------------------------------------------------------
+ */
+export default function App() {
+  return (
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="app-header__brand">
+          <span className="app-header__brand-mark">📈</span>
+          Prediction Market
+        </div>
+      </header>
+
+      <main className="app-main">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/markets/:id" element={<MarketPage />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+</file>
+
+<file path="client/src/main.jsx">
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App.jsx";
+import "./index.css";
+
+/**
+ * main.jsx
+ * -----------------------------------------------------------------------
+ * The actual entry point — this is what index.html loads. BrowserRouter
+ * wraps the whole app so that every component inside it (App, HomePage,
+ * MarketPage, and anything using <Link> or useNavigate) can participate
+ * in client-side routing.
+ * -----------------------------------------------------------------------
+ */
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>
+);
+</file>
+
+<file path="client/vite.config.js">
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    // Proxy /api requests to the Express backend during development,
+    // so the frontend can call fetch('/api/markets') without worrying
+    // about CORS or hardcoding http://localhost:4000 everywhere.
+    proxy: {
+      "/api": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+    },
+  },
+});
 </file>
 
 <file path="package.json">
