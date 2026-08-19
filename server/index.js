@@ -208,10 +208,22 @@ app.post("/api/markets/:id/resolve", (req, res, next) => {
       market.id
     );
 
-    // Payouts: for each trader, sum their shares on the WINNING side.
-    // Winning shares pay $1 each; losing shares pay $0 (so they're
-    // just omitted).
-    const payoutRows = db
+    // Every trader who ever traded on this market, and how much they
+    // spent IN TOTAL (both sides, all trades) — this is their cost
+    // basis for computing profit/loss.
+    const spendRows = db
+      .prepare(
+        `SELECT trader, SUM(spend) as totalSpent
+         FROM trades
+         WHERE market_id = ?
+         GROUP BY trader`
+      )
+      .all(market.id);
+
+    // How many shares each trader holds on the WINNING side specifically
+    // — that's what pays out $1 each. Anyone not in this list held only
+    // losing-side shares, so their payout is $0.
+    const winningShareRows = db
       .prepare(
         `SELECT trader, SUM(shares) as totalShares
          FROM trades
@@ -220,11 +232,21 @@ app.post("/api/markets/:id/resolve", (req, res, next) => {
       )
       .all(market.id, outcome);
 
-    const payouts = payoutRows.map((r) => ({
-      trader: r.trader,
-      winningShares: r.totalShares,
-      payout: r.totalShares, // $1 per winning share
-    }));
+    const winningSharesByTrader = new Map(
+      winningShareRows.map((r) => [r.trader, r.totalShares])
+    );
+
+    // Combine into one row per trader: what they spent, what they were
+    // paid, and the difference (profit if positive, loss if negative).
+    const payouts = spendRows.map((r) => {
+      const payout = winningSharesByTrader.get(r.trader) || 0;
+      return {
+        trader: r.trader,
+        spent: r.totalSpent,
+        payout,
+        profit: payout - r.totalSpent,
+      };
+    });
 
     res.json({ outcome, payouts });
   } catch (err) {

@@ -9,6 +9,10 @@ import { api } from "../api";
  * here, so anyone can resolve any market — fine for a solo sandbox,
  * and a good thing to flag in an interview as "here's the seam where
  * I'd add an admin role and auth check for production."
+ *
+ * Each payout row shows what a trader spent (across every trade they
+ * placed on this market, win or lose), what they were paid out, and
+ * the difference as profit (green) or loss (red).
  * -----------------------------------------------------------------------
  */
 export function ResolvePanel({ marketId, resolved, outcome, onResolved }) {
@@ -49,7 +53,21 @@ export function ResolvePanel({ marketId, resolved, outcome, onResolved }) {
             {payouts.map((p) => (
               <div className="payout-row" key={p.trader}>
                 <span>{p.trader}</span>
-                <span>${p.payout.toFixed(2)}</span>
+                <span style={{ display: "flex", gap: 16 }}>
+                  <span style={{ color: "var(--color-text-faint)" }}>
+                    spent ${p.spent.toFixed(2)}
+                  </span>
+                  <span>paid ${p.payout.toFixed(2)}</span>
+                  <strong
+                    style={{
+                      color:
+                        p.profit >= 0 ? "var(--color-yes)" : "var(--color-no)",
+                      minWidth: 70,
+                      textAlign: "right",
+                    }}>
+                    {p.profit >= 0 ? "+" : ""}${p.profit.toFixed(2)}
+                  </strong>
+                </span>
               </div>
             ))}
           </div>
